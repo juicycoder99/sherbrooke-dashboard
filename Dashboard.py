@@ -17,18 +17,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+import gdown
+
 # Google Drive file IDs
 file_id_1 = "1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
 file_id_2 = "1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
 
-# Download from Google Drive using gdown
-import gdown
-gdown.download(f"https://drive.google.com/uc?id={file_id_1}", "sherbrooke_fixed_sensor_readings.csv", quiet=False)
-gdown.download(f"https://drive.google.com/uc?id={file_id_2}", "sherbrooke_sensor_readings_with_anomalies.csv", quiet=False)
+# Construct downloadable URLs
+url1 = f"https://drive.google.com/uc?id={file_id_1}"
+url2 = f"https://drive.google.com/uc?id={file_id_2}"
 
-# File paths
-file_path_1 = "sherbrooke_fixed_sensor_readings.csv"
-file_path_2 = "sherbrooke_sensor_readings_with_anomalies.csv"
+# Download and save locally
+gdown.download(url1, 'fixed.csv', quiet=False)
+gdown.download(url2, 'anomalies.csv', quiet=False)
+
+# Then load
+df = pd.read_csv('fixed.csv')
+data2 = pd.read_csv('anomalies.csv')
+
+
 
 
 
