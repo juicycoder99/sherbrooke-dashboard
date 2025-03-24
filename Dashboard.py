@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 from datetime import datetime, timedelta
+import gdown
 
 # Set Streamlit page configuration 
 st.set_page_config(page_title="Temperature, Humidity, Moisture & Gas Dashboard", layout="wide")
@@ -16,48 +17,57 @@ st.markdown("""
     </h1>
 """, unsafe_allow_html=True)
 
+# ✅ Cached loader + preprocessor
+@st.cache_data
+def load_and_preprocess():
+    # Google Drive file IDs
+    file_id_1 = "1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
+    file_id_2 = "1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
 
-import gdown
+    # Construct URLs
+    url1 = f"https://drive.google.com/uc?id={file_id_1}"
+    url2 = f"https://drive.google.com/uc?id={file_id_2}"
 
-# Google Drive file IDs
-file_id_1 = "1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
-file_id_2 = "1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
+    # Download the files (quiet mode)
+    gdown.download(url1, 'fixed.csv', quiet=True)
+    gdown.download(url2, 'anomalies.csv', quiet=True)
 
-# Construct downloadable URLs
-url1 = f"https://drive.google.com/uc?id={file_id_1}"
-url2 = f"https://drive.google.com/uc?id={file_id_2}"
+    # Read CSV files
+    df = pd.read_csv('fixed.csv', sep=";", on_bad_lines='skip', engine='python')
+    data2 = pd.read_csv('anomalies.csv', sep=";", on_bad_lines='skip', engine='python')
 
-# Download and save locally
-gdown.download(url1, 'fixed.csv', quiet=False)
-gdown.download(url2, 'anomalies.csv', quiet=False)
+    # ✅ Combine Date and Time into a single Datetime column
+    if 'Date' in df.columns and 'Time' in df.columns:
+        df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], errors='coerce')
+        df.drop(columns=['Date', 'Time'], inplace=True)
 
-# 👇 Keep your successful loading
-df = pd.read_csv('fixed.csv')
-data2 = pd.read_csv('anomalies.csv')
-st.success("✅ Datasets loaded successfully from Google Drive!")
+    if 'Date' in data2.columns and 'Time' in data2.columns:
+        data2['Datetime'] = pd.to_datetime(data2['Date'] + ' ' + data2['Time'], errors='coerce')
+        data2.drop(columns=['Date', 'Time'], inplace=True)
 
-# ✅ Combine Date and Time into a single Datetime column (if applicable)
-if 'Date' in df.columns and 'Time' in df.columns:
-    df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], errors='coerce')
-    df.drop(columns=['Date', 'Time'], inplace=True)
+    # ✅ Set Datetime as index
+    df.set_index('Datetime', inplace=True)
+    data2.set_index('Datetime', inplace=True)
 
-if 'Date' in data2.columns and 'Time' in data2.columns:
-    data2['Datetime'] = pd.to_datetime(data2['Date'] + ' ' + data2['Time'], errors='coerce')
-    data2.drop(columns=['Date', 'Time'], inplace=True)
+    # ✅ Encode categorical variables
+    if 'Gas_Level' in df.columns:
+        df['Gas_Level'] = df['Gas_Level'].astype('category').cat.codes
+    if 'Gas_Level' in data2.columns:
+        data2['Gas_Level'] = data2['Gas_Level'].astype('category').cat.codes
 
-# ✅ Set Datetime as index
-df.set_index('Datetime', inplace=True)
-data2.set_index('Datetime', inplace=True)
+    # ✅ Drop missing values
+    df.dropna(inplace=True)
+    data2.dropna(inplace=True)
 
-# ✅ Encode categorical variables if any exist
-if 'Gas_Level' in df.columns:
-    df['Gas_Level'] = df['Gas_Level'].astype('category').cat.codes
-if 'Gas_Level' in data2.columns:
-    data2['Gas_Level'] = data2['Gas_Level'].astype('category').cat.codes
+    return df, data2
 
-# ✅ Handle missing values
-df.dropna(inplace=True)
-data2.dropna(inplace=True)
+# Load once per session
+try:
+    df, data2 = load_and_preprocess()
+    st.success("✅ Datasets loaded successfully from Google Drive!")
+except Exception as e:
+    st.error(f"❌ Failed to load datasets.\nError: {e}")
+
 
 
     
