@@ -6,6 +6,19 @@ import seaborn as sns
 import datetime
 from datetime import datetime, timedelta
 
+# Set Streamlit page configuration 
+st.set_page_config(page_title="Temperature, Humidity, Moisture & Gas Dashboard", layout="wide")
+
+# Add a header with title
+st.markdown("""
+    <h1 style='text-align: center; color: white; background-color: #176B87; padding: 15px; border-radius: 10px;'>
+        Temperature, Humidity, Moisture & Gas Dashboard
+    </h1>
+""", unsafe_allow_html=True)
+
+
+
+
 
 
 # File URLs from Google Drive (updated to direct download format)
@@ -45,19 +58,6 @@ except Exception as e:
     data2.dropna(inplace=True)
 
     
-# Set Streamlit page configuration 
-st.set_page_config(page_title="Temperature, Humidity, Moisture & Gas Dashboard", layout="wide")
-
-# Add a header with title
-st.markdown("""
-    <h1 style='text-align: center; color: white; background-color: #176B87; padding: 15px; border-radius: 10px;'>
-        Temperature, Humidity, Moisture & Gas Dashboard
-    </h1>
-""", unsafe_allow_html=True)
-
-
-
-
 
 
 
