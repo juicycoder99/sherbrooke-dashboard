@@ -31,45 +31,34 @@ url2 = f"https://drive.google.com/uc?id={file_id_2}"
 gdown.download(url1, 'fixed.csv', quiet=False)
 gdown.download(url2, 'anomalies.csv', quiet=False)
 
-# Then load
+# 👇 Keep your successful loading
 df = pd.read_csv('fixed.csv')
 data2 = pd.read_csv('anomalies.csv')
+st.success("✅ Datasets loaded successfully from Google Drive!")
 
+# ✅ Combine Date and Time into a single Datetime column (if applicable)
+if 'Date' in df.columns and 'Time' in df.columns:
+    df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], errors='coerce')
+    df.drop(columns=['Date', 'Time'], inplace=True)
 
+if 'Date' in data2.columns and 'Time' in data2.columns:
+    data2['Datetime'] = pd.to_datetime(data2['Date'] + ' ' + data2['Time'], errors='coerce')
+    data2.drop(columns=['Date', 'Time'], inplace=True)
 
+# ✅ Set Datetime as index
+df.set_index('Datetime', inplace=True)
+data2.set_index('Datetime', inplace=True)
 
+# ✅ Encode categorical variables if any exist
+if 'Gas_Level' in df.columns:
+    df['Gas_Level'] = df['Gas_Level'].astype('category').cat.codes
+if 'Gas_Level' in data2.columns:
+    data2['Gas_Level'] = data2['Gas_Level'].astype('category').cat.codes
 
-try:
-    # Load datasets from Google Drive
-    df = pd.read_csv(file_path_1, sep=";", on_bad_lines='skip', engine='python')
-    data2 = pd.read_csv(file_path_2, sep=";", on_bad_lines='skip', engine='python')
-    st.success("✅ Datasets loaded successfully from Google Drive!")
-except Exception as e:
-    st.error(f"❌ Failed to load datasets.\nError: {e}")
+# ✅ Handle missing values
+df.dropna(inplace=True)
+data2.dropna(inplace=True)
 
-
-    # ✅ Combine Date and Time into a single Datetime column (if applicable)
-    if 'Date' in df.columns and 'Time' in df.columns:
-        df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], errors='coerce')
-        df.drop(columns=['Date', 'Time'], inplace=True)
-    
-    if 'Date' in data2.columns and 'Time' in data2.columns:
-        data2['Datetime'] = pd.to_datetime(data2['Date'] + ' ' + data2['Time'], errors='coerce')
-        data2.drop(columns=['Date', 'Time'], inplace=True)
-
-    # ✅ Set Datetime as index
-    df.set_index('Datetime', inplace=True)
-    data2.set_index('Datetime', inplace=True)
-
-    # ✅ Encode categorical variables if any exist
-    if 'Gas_Level' in df.columns:
-        df['Gas_Level'] = df['Gas_Level'].astype('category').cat.codes
-    if 'Gas_Level' in data2.columns:
-        data2['Gas_Level'] = data2['Gas_Level'].astype('category').cat.codes
-
-    # ✅ Handle missing values (optional)
-    df.dropna(inplace=True)
-    data2.dropna(inplace=True)
 
     
 
