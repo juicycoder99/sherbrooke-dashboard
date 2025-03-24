@@ -20,6 +20,8 @@ st.markdown("""
 # ✅ Cached loader + preprocessor
 @st.cache_data
 def load_and_preprocess():
+    import gdown
+
     # Google Drive file IDs
     file_id_1 = "1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
     file_id_2 = "1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
@@ -28,15 +30,15 @@ def load_and_preprocess():
     url1 = f"https://drive.google.com/uc?id={file_id_1}"
     url2 = f"https://drive.google.com/uc?id={file_id_2}"
 
-    # Download the files (quiet mode)
+    # Download CSV files
     gdown.download(url1, 'fixed.csv', quiet=True)
     gdown.download(url2, 'anomalies.csv', quiet=True)
 
-    # Read CSV files
-    df = pd.read_csv('fixed.csv', sep=";", on_bad_lines='skip', engine='python')
-    data2 = pd.read_csv('anomalies.csv', sep=";", on_bad_lines='skip', engine='python')
+    # 🔄 Read using default comma separator (safe for Excel-exported CSV)
+    df = pd.read_csv('fixed.csv', on_bad_lines='skip')
+    data2 = pd.read_csv('anomalies.csv', on_bad_lines='skip')
 
-    # ✅ Combine Date and Time into a single Datetime column
+    # ✅ Combine Date and Time into Datetime
     if 'Date' in df.columns and 'Time' in df.columns:
         df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], errors='coerce')
         df.drop(columns=['Date', 'Time'], inplace=True)
@@ -49,26 +51,17 @@ def load_and_preprocess():
     df.set_index('Datetime', inplace=True)
     data2.set_index('Datetime', inplace=True)
 
-    # ✅ Encode categorical variables
+    # ✅ Encode Gas_Level
     if 'Gas_Level' in df.columns:
         df['Gas_Level'] = df['Gas_Level'].astype('category').cat.codes
     if 'Gas_Level' in data2.columns:
         data2['Gas_Level'] = data2['Gas_Level'].astype('category').cat.codes
 
-    # ✅ Drop missing values
+    # ✅ Drop missing rows
     df.dropna(inplace=True)
     data2.dropna(inplace=True)
 
     return df, data2
-
-# Load once per session
-try:
-    df, data2 = load_and_preprocess()
-    st.success("✅ Datasets loaded successfully from Google Drive!")
-except Exception as e:
-    st.error(f"❌ Failed to load datasets.\nError: {e}")
-
-
 
     
 
