@@ -21,9 +21,24 @@ st.markdown("""
 
 
 
-# File URLs from Google Drive (updated to direct download format)
-file_path_1 = "https://drive.google.com/file/d/1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
-file_path_2 = "https://drive.google.com/file/d/1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
+import gdown
+
+# Google Drive file IDs
+file_id_1 = "1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
+file_id_2 = "1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
+
+# Construct downloadable URLs
+url1 = f"https://drive.google.com/uc?id={file_id_1}"
+url2 = f"https://drive.google.com/uc?id={file_id_2}"
+
+# Download and save locally
+gdown.download(url1, 'fixed.csv', quiet=False)
+gdown.download(url2, 'anomalies.csv', quiet=False)
+
+# Then load
+df = pd.read_csv('fixed.csv')
+data2 = pd.read_csv('anomalies.csv')
+
 
 try:
     # Load datasets from Google Drive
@@ -187,11 +202,6 @@ if 'last_update' in st.session_state:
 # Display metrics
 random_row = st.session_state.random_row
 cols = st.columns(4)
-
-# Debugging check
-st.write("📋 Columns in random_row:", random_row.index.tolist())
-st.write("🔍 Sampled row content:", random_row)
-
 
 cols[0].metric(label=f"Temperature: {random_row['Location']}", value=f"{round(random_row['Temperature'], 2)} °C", delta="Last update")
 cols[1].metric(label=f"Humidity: {random_row['Location']}", value=f"{round(random_row['Humidity'], 2)} %", delta="Last update")
