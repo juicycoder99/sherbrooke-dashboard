@@ -14,8 +14,8 @@ file_path_2 = "https://drive.google.com/file/d/1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8
 
 try:
     # Load datasets from Google Drive
-    df = pd.read_csv(file_path_1)
-    data2 = pd.read_csv(file_path_2)
+    df = pd.read_csv(file_path_1, sep=";")
+    data2 = pd.read_csv(file_path_2, sep=";")
     st.success("✅ Datasets loaded successfully from Google Drive!")
 except Exception as e:
     st.error(f"❌ Failed to load datasets.\nError: {e}")
