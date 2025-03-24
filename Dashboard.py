@@ -75,6 +75,7 @@ st.sidebar.markdown(f" **Current Time:** {datetime.now().strftime('%I:%M:%S %p')
 dataset_choice = st.sidebar.radio("🗂 Select Dataset:", ["Normal Readings", "Anomalies"])
 
 # Select the appropriate dataset
+df, data2 = load_and_preprocess()
 data = df if dataset_choice == "Normal Readings" else data2
 
 with st.sidebar.expander("📄 Dashboard Info", expanded=False):
