@@ -188,6 +188,11 @@ if 'last_update' in st.session_state:
 random_row = st.session_state.random_row
 cols = st.columns(4)
 
+# Debugging check
+st.write("📋 Columns in random_row:", random_row.index.tolist())
+st.write("🔍 Sampled row content:", random_row)
+
+
 cols[0].metric(label=f"Temperature: {random_row['Location']}", value=f"{round(random_row['Temperature'], 2)} °C", delta="Last update")
 cols[1].metric(label=f"Humidity: {random_row['Location']}", value=f"{round(random_row['Humidity'], 2)} %", delta="Last update")
 cols[2].metric(label=f"Moisture: {random_row['Location']}", value=f"{round(random_row['Moisture'], 2)}", delta="Last update")
