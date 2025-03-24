@@ -8,18 +8,18 @@ from datetime import datetime, timedelta
 
 
 
+# File URLs from Google Drive (updated to direct download format)
+file_path_1 = "https://drive.google.com/file/d/1dL3siMY6KaX1z0f6C5GVgTlJ06b7_Wru"
+file_path_2 = "https://drive.google.com/file/d/1CHO_ToDIw7EET0TfAb1xOV4VynIYPrh8"
 
-# File paths
-file_path_1 = "sherbrooke_fixed_sensor_readings.csv"
-file_path_2 = "sherbrooke_sensor_readings_with_anomalies.csv"
-
-# Check if files exist
-if not os.path.exists(file_path_1) or not os.path.exists(file_path_2):
-    st.error("❌ Dataset files not found! Make sure CSV files are in the same directory as this script.")
-else:
-    # Load datasets
+try:
+    # Load datasets from Google Drive
     df = pd.read_csv(file_path_1)
     data2 = pd.read_csv(file_path_2)
+    st.success("✅ Datasets loaded successfully from Google Drive!")
+except Exception as e:
+    st.error(f"❌ Failed to load datasets.\nError: {e}")
+
 
     # ✅ Combine Date and Time into a single Datetime column (if applicable)
     if 'Date' in df.columns and 'Time' in df.columns:
